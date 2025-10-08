@@ -1,0 +1,174 @@
+/* Root container */
+#root {
+  font-family: 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  max-width: 500px;
+  margin: 2rem auto;
+  display: flex;
+  flex-direction: column;
+  height: 80vh;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  background-color: var(--bg);
+  transition: background-color 0.3s ease, color 0.3s ease;
+  color: var(--text);
+}
+
+/* Theme variables */
+:root {
+  --bg: #f7f9fc;
+  --text: #111;
+  --chat-bg: #ffffff;
+  --user-msg-bg: linear-gradient(120deg, #4facfe, #00f2fe);
+  --ai-msg-bg: #f1f1f1;
+  --input-bg: #ffffff;
+  --input-border: #ddd;
+  --placeholder: #999;
+}
+
+[data-theme="dark"] {
+  --bg: #1e1e2f;
+  --text: #e0e0e0;
+  --chat-bg: #2b2b3a;
+  --user-msg-bg: linear-gradient(120deg, #6b9cff, #1db7ff);
+  --ai-msg-bg: #3a3a4b;
+  --input-bg: #2b2b3a;
+  --input-border: #555;
+  --placeholder: #aaa;
+}
+
+/* Theme toggle button */
+.theme-toggle {
+  padding: 6px 12px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+:root .theme-toggle { background: #111; color: #fff; }
+[data-theme="dark"] .theme-toggle { background: #fff; color: #111; }
+
+/* Chat window */
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  background-color: var(--chat-bg);
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+/* Messages list */
+.message-list {
+  flex-grow: 1;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow-y: auto;
+  background: linear-gradient(to bottom, var(--bg), var(--chat-bg));
+  scroll-behavior: smooth;
+}
+
+/* Bubbles */
+.message {
+  padding: 12px 18px;
+  border-radius: 20px;
+  max-width: 75%;
+  line-height: 1.4;
+  word-break: break-word;
+  font-size: 15px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+  position: relative;
+  transition: all 0.2s ease, background 0.3s ease, color 0.3s ease;
+}
+
+.message.user {
+  background: var(--user-msg-bg);
+  color: white;
+  align-self: flex-end;
+  border-bottom-right-radius: 4px;
+}
+
+.message.ai {
+  background-color: var(--ai-msg-bg);
+  color: var(--text);
+  align-self: flex-start;
+  border-bottom-left-radius: 4px;
+}
+
+/* Typing indicator (separate bubble) */
+.typing-indicator {
+  font-style: italic;
+  color: #666;
+  max-width: 50%;
+  align-self: flex-start;
+  display: flex;
+  gap: 4px;
+  padding: 10px 15px;
+  border-radius: 20px;
+  background-color: var(--ai-msg-bg);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+}
+
+.typing-indicator .dot {
+  animation: blinkDot 1s infinite;
+  display: inline-block;
+}
+
+.typing-indicator .dot:nth-child(1) { animation-delay: 0s; }
+.typing-indicator .dot:nth-child(2) { animation-delay: 0.2s; }
+.typing-indicator .dot:nth-child(3) { animation-delay: 0.4s; }
+
+@keyframes blinkDot {
+  0%, 50%, 100% { opacity: 0; }
+  25% { opacity: 1; }
+}
+
+/* Footer input */
+.message-input {
+  display: flex;
+  padding: 15px 20px;
+  border-top: 1px solid var(--input-border);
+  background-color: var(--input-bg);
+}
+
+.message-input input {
+  flex-grow: 1;
+  padding: 12px 18px;
+  border: 1px solid var(--input-border);
+  border-radius: 30px;
+  font-size: 15px;
+  outline: none;
+  color: var(--text);
+  background-color: var(--input-bg);
+  transition: all 0.2s ease, border-color 0.3s ease;
+}
+
+.message-input input::placeholder { color: var(--placeholder); }
+
+.message-input input:focus {
+  border-color: #4facfe;
+  box-shadow: 0 0 10px rgba(79, 172, 254, 0.3);
+}
+
+.message-input button {
+  padding: 12px 25px;
+  border-radius: 30px;
+  margin-left: 10px;
+  background: var(--user-msg-bg);
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+  transition: all 0.2s ease;
+}
+
+.message-input button:hover { opacity: 0.9; transform: scale(1.05); }
+
+/* Scrollbar */
+.message-list::-webkit-scrollbar { width: 6px; }
+.message-list::-webkit-scrollbar-thumb { background-color: rgba(0,0,0,0.2); border-radius: 3px; }
+.message-list::-webkit-scrollbar-track { background: transparent; }
