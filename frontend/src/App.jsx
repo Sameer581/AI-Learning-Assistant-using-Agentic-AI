@@ -15,16 +15,14 @@ function App() {
   const aiMsgIdRef = useRef(null);
   const abortRef = useRef(null);
 
-  // Auto‑scroll on new messages
   useEffect(() => {
     if (messageListRef.current) {
       messageListRef.current.scrollTop = messageListRef.current.scrollHeight;
     }
-  }, [messages]); // React batches updates; scrolling after render is reliable [web:33][web:122]
+  }, [messages]);
 
-  // Apply theme
   useEffect(() => {
-    document.documentElement.setAttribute('data-theme', theme); // attribute selector drives CSS vars [web:80][web:89]
+    document.documentElement.setAttribute('data-theme', theme);
   }, [theme]);
 
   const toggleTheme = () => setTheme(theme === 'light' ? 'dark' : 'light');
@@ -37,7 +35,6 @@ function App() {
     setInput('');
     setIsAITyping(true);
 
-    // Insert user bubble (right) and AI placeholder (left)
     const userId = makeId();
     const aiId = makeId();
     aiMsgIdRef.current = aiId;
@@ -46,14 +43,14 @@ function App() {
       ...prev,
       { id: userId, text: userText, sender: 'user' },
       { id: aiId, text: '', sender: 'ai' }
-    ]); // queue a single render with both entries [web:33][web:122]
+    ]);
 
-    // cancel any existing stream
     if (abortRef.current) abortRef.current.abort();
     abortRef.current = new AbortController();
 
     try {
-      const response = await fetch('http://localhost:8000/api/chat/', {
+      // <--- HERE'S THE IMPORTANT CHANGE
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/chat/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: userText, sender_type: 'user' }),
@@ -75,7 +72,6 @@ function App() {
 
         buffer += decoder.decode(value, { stream: true });
 
-        // Parse SSE: events separated by a blank line; data may span multiple lines
         const events = buffer.split(/\r?\n\r?\n/);
         buffer = events.pop() || '';
 
@@ -84,7 +80,7 @@ function App() {
             .split(/\r?\n/)
             .filter(l => l.startsWith('data:'))
             .map(l => l.slice(5).trim())
-            .join('\n'); // reconstruct payload per spec [web:80][web:153]
+            .join('\n');
 
           if (!data) continue;
           if (data === '[DONE]') {
@@ -97,10 +93,9 @@ function App() {
             const piece = json.choices?.[0]?.delta?.content || '';
             if (!piece) continue;
 
-            // Append strictly to the current AI bubble
             setMessages(prev =>
               prev.map(m => (m.id === aiMsgIdRef.current ? { ...m, text: m.text + piece } : m))
-            ); // functional update avoids stale state during queued updates [web:33][web:122]
+            );
           } catch (err) {
             console.error('Stream parse error:', err);
           }
@@ -127,14 +122,12 @@ function App() {
 
   return (
     <div id="root">
-      {/* Theme Toggle */}
       <div style={{ textAlign: 'right', padding: '10px' }}>
         <button onClick={toggleTheme} className="theme-toggle">
           {theme === 'light' ? 'Dark Mode' : 'Light Mode'}
         </button>
       </div>
 
-      {/* Chat Window */}
       <div className="chat-window">
         <div className="message-list" ref={messageListRef}>
           {messages.map((msg) => (
@@ -143,7 +136,6 @@ function App() {
             </div>
           ))}
 
-          {/* Optional separate typing bubble — keep if desired */}
           {isAITyping && aiMsgIdRef.current && (
             <div className="message ai typing-indicator">
               AI is typing<span className="dot">.</span><span className="dot">.</span><span className="dot">.</span>
