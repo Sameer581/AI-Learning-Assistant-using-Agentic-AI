@@ -16,14 +16,15 @@ models.Base.metadata.create_all(bind=engine)
 # Initialize app
 app = FastAPI()
 
-# CORS setup for frontend connection
+# CORS Setup
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173"],  # React local dev server
+    allow_origins=["https://multiagentasssistant.netlify.app"],  # or use ["*"] for testing
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
 
 
 # Dependency to get database session
@@ -83,3 +84,4 @@ async def handle_chat_message(message: schemas.MessageCreate, db: Session = Depe
         stream_ai_response(message.content, db, user_id),
         media_type="text/event-stream"
     )
+
